@@ -1,0 +1,75 @@
+name: "build-python"
+description: "Action to build a Python and poetry environment."
+
+inputs:
+  python-version:
+    required: true
+    description: "The python version to use"
+
+  context-directory:
+    required: true
+    description: "The context directory to use"
+    default: "."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set up python
+      uses: actions/setup-python@v5
+      with:
+        python-version: ${{ inputs.python-version }}
+
+    - name: Install Poetry
+      uses: snok/install-poetry@v1
+      with:
+        virtualenvs-in-project: true
+
+    # - name: Load cached venv
+    #   id: cached-poetry-dependencies
+    #   uses: actions/cache@v3
+    #   with:
+    #     path: .venv
+    #     key: venv-${{ runner.os }}-${{ inputs.python-version }}-${{ hashFiles('poetry.lock') }}
+
+    # - name: Install dependencies
+    #   working-directory: ${{ inputs.context-directory }}
+    #   if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+    #   run: poetry install --no-interaction
+    #   shell: bash
+    #   env:
+    #     POETRY_CACHE_DIR: ${{ github.workspace }}/.cache
+    #     TMPDIR: ${{ github.workspace }}
+
+    # - name: Remove Poetry cache
+    #   run: rm -rf ${{ github.workspace }}/.cache
+    #   shell: bash
+
+    - name: Install dependencies
+      working-directory: ${{ inputs.context-directory }}
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+        pip install nbconvert jupyter
+        pip install nbqa flake8
+      shell: bash
+
+    # - name: Make Tests
+    #   working-directory: ${{ inputs.context-directory }}
+    #   run: make tests
+    #   shell: bash
+
+    - name: Lint Jupyter Notebooks
+      run: |
+        nbqa --version
+        nbqa flake8 .
+      shell: bash
+
+    # Step 4: Execute notebooks
+    - name: Execute Jupyter Notebooks
+      working-directory: ${{ inputs.context-directory }}
+      run: |
+        for notebook in $(find . -name "*.ipynb"); do
+          echo "Testing $notebook"
+          jupyter nbconvert --to notebook --execute "$notebook" --stdout > /dev/null
+        done
+      shell: bash

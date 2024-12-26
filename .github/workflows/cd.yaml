@@ -1,0 +1,43 @@
+name: "CD"
+
+on:
+  workflow_dispatch:
+
+# Allow subsequently queued workflows to cancel previous runs
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }} - CI"
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: "1"
+
+jobs:
+  Build-Containers:
+    name: Build notebook containers
+    environment: dev
+    runs-on: Large-Github-Hosted-Runner
+    permissions:
+      packages: write
+      contents: write
+    if: github.event.pull_request.draft == false
+    steps:
+      - name: Checkout Actions Repository
+        uses: actions/checkout@v4
+
+      - name: Basic notebooks
+        uses: ./.github/actions/package-container
+        with:
+          FOLDER_PATH: ./basic/code
+          IMAGE_NAME: notebook-basic
+          USERNAME: ${{ github.actor }}
+          ORGANIZATION_NAME: ${{ vars.CONTAINER_REPOSITORY_OWNER }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: GPU notebooks
+        uses: ./.github/actions/package-container
+        with:
+          FOLDER_PATH: ./gpu/code
+          IMAGE_NAME: notebook-gpu
+          USERNAME: ${{ github.actor }}
+          ORGANIZATION_NAME: ${{ vars.CONTAINER_REPOSITORY_OWNER }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}

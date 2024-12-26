@@ -1,0 +1,27 @@
+metadata:
+  clusterName: notebook15
+  clusterConfigDir: "./basic/cluster/config"
+  pulumi:
+    orgName: kubox-ai
+    projectName: playground
+
+tags:
+  - key: "Environment"
+    value: "dev"
+
+# These will be passed to Flux
+gitOps:
+  directoryName: "./basic/cluster"
+
+aws:
+  region: "ap-southeast-2"
+  nodes:
+    - vmType: t2.medium
+      count: 1
+      role: control-plane
+      spotInstance: false
+    - vmType: c4.4xlarge
+      count: 1
+      role: worker
+      spotInstance: false
+      awsIAMInstanceProfile: KuboxEC2InstanceRole

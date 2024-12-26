@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "playgroup"
+version = "0.0.1"
+description = "A gpu notebook project"
+authors = ["Chinkit Patel <chinkit@local.com>"]
+repository = "http://github.com/kubox-ai/notebooks"
+documentation = "https://docs.kubox.ai/"
+readme = "README.md"
+packages = [
+ 
+]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+numpy = "^2.2.1"
+torch = "^2.5.1"
+torchvision = "^0.20.1"
+torchaudio = "^2.5.1"
+boto3 = "^1.35.88"
+transformers = "^4.47.1"

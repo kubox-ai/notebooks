@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "playgroup"
+version = "0.0.1"
+description = "A basic notebook project"
+authors = ["Chinkit Patel <chinkit@local.com>"]
+repository = "http://github.com/kubox-ai/notebooks"
+documentation = "https://docs.kubox.ai/"
+readme = "README.md"
+packages = [
+ 
+]
+
+[tool.poetry.dependencies]
+python = ">=3.11,<3.12"
+numpy = "^2.2.1"
+getdaft = {extras = ["aws"], version = "^0.4.1"}
+seaborn = "^0.13.2"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.10.0"
+flake8 = "^7.1.1"
+nbqa = "^1.9.1"

@@ -1,0 +1,43 @@
+name: "CI"
+
+on:
+  push:
+  workflow_dispatch:
+
+# Allow subsequently queued workflows to cancel previous runs
+concurrency:
+  group: "${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }} - CI"
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: "1"
+
+jobs:
+  prettier:
+    name: Prettier
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prettify code
+        uses: creyD/prettier_action@v4.3
+        with:
+          dry: true
+          prettier_options: --log-level debug --check .
+
+  Build-Notebooks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+
+      - name: Basic Notebooks
+        uses: ./.github/actions/build-notebooks
+        with:
+          context-directory: ./basic/code
+          python-version: 3.11
+
+      - name: GPU Notebooks
+        uses: ./.github/actions/build-notebooks
+        with:
+          context-directory: ./gpu/code
+          python-version: 3.11
